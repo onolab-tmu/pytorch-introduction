@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "pytorch-introduction"
+version = "0.0.1"
+description = ""
+authors = ["Yuma Kinoshita"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.7"
+torchsummary = "^1.5.1"
+matplotlib = "^3.2.1"
+Pillow = "^7.1.1"
+torch = {url = "https://download.pytorch.org/whl/cu101/torch-1.5.0%2Bcu101-cp37-cp37m-linux_x86_64.whl"}
+torchvision = {url = "https://download.pytorch.org/whl/cu101/torchvision-0.6.0%2Bcu101-cp37-cp37m-linux_x86_64.whl"}
+torchaudio = {url = "https://download.pytorch.org/whl/torchaudio-0.5.0-cp37-cp37m-linux_x86_64.whl"}
+
+[tool.poetry.dev-dependencies]
+ipython = "^7.13.0"
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
