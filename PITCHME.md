@@ -177,9 +177,28 @@ Yuma Kinoshita
     - 仮想環境を作っている人は仮想環境を有効にしてから
 1. torchaudio (音響処理用パッケージ) のインストール
     ```
-    pip install torchaudio
+    $ pip install torchaudio
     ```
 1. その他パッケージのインストール
     ```
-    pip install matplotlib
+    $ pip install matplotlib torchsummary
     ```
+
++++
+
+### 学習の実行
+    ```
+    $ cd ./src
+    $ python train.py
+    ```
+
++++
+
+### モデルの評価
+    ```
+    $ python test.py
+    ```
+
++++
+
+### 解説
