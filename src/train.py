@@ -11,7 +11,7 @@ from torchsummary import summary
 import trainer
 import model
 import transform as mytf
-from dataset import VCTKWrapper, LIBRISPEECHWrapper, SPEECHCOMMANDSWrapper, AudioFolder
+from dataset import AudioFolder, PreLoadAudioFolder
 
 def parse_cmd_line_arguments():
     parser = argparse.ArgumentParser(description='')
@@ -23,7 +23,7 @@ def parse_cmd_line_arguments():
                         default='../data/small-acoustic-scenes')
     parser.add_argument('--batch_size', help='Batch size',
                         type=int,
-                        default=1)
+                        default=4)
     parser.add_argument('--seed', help='Random seed',
                         type=int,
                         default=None)
@@ -55,8 +55,10 @@ def get_data_loaders(path, batch_size):
     transform = mytf.Compose([torchaudio.transforms.Resample(44100, 8000),
                               torchaudio.transforms.Spectrogram(n_fft=512)])
 
-    trainset = AudioFolder(p / 'train', transform=transform)
-    valset = AudioFolder(p / 'evaluate', transform=transform)
+    # trainset = AudioFolder(p / 'train', transform=transform)
+    trainset = PreLoadAudioFolder(p / 'train', transform=transform)
+    # valset = AudioFolder(p / 'evaluate', transform=transform)
+    valset = PreLoadAudioFolder(p / 'evaluate', transform=transform)
 
     trainloader = torch.utils.data.DataLoader(trainset, batch_size=batch_size,
                                               shuffle=True, num_workers=2)
@@ -103,8 +105,8 @@ if __name__ == "__main__":
                                                0.1)
 
     start_time = time.time()
-    trainer = trainer.RegressorTrainer(net, optimizer, criterion,
-                                       trainloader, device)
+    trainer = trainer.ClassifierTrainer(net, optimizer, criterion,
+                                        trainloader, device)
     costs = []
     train_accuracy = []
     val_accuracy = []

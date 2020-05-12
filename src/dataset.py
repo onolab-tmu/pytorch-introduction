@@ -1,3 +1,4 @@
+import sys
 import os
 import os.path
 import torch
@@ -297,3 +298,36 @@ class AudioFolder(DatasetFolder):
                                           is_valid_file=is_valid_file)
         self.tracks = self.samples
     
+
+class PreLoadAudioFolder(AudioFolder):
+    def __init__(self, *args, **kwargs):
+        super(PreLoadAudioFolder, self).__init__(*args, **kwargs)
+        self.load_all()
+    
+    def load_all(self):
+        preprocessed_samples = []
+        for i in range(len(self)):
+            sys.stdout.write("\rloaded {0} / {1}".format(i+1, len(self)))
+            sys.stdout.flush()
+            path, target = self.samples[i]
+            sample = self.loader(path)
+
+            if self.transform is not None:
+                sample = self.transform(sample)
+            if self.target_transform is not None:
+                target = self.target_transform(target)
+
+            preprocessed_samples.append((sample, target))
+
+        self.preprocessed_samples = preprocessed_samples
+        sys.stdout.write("\n")
+
+    def __getitem__(self, index):
+        """
+        Args:
+            index (int): Index
+
+        Returns:
+            tuple: (sample, target) where target is class_index of the target class.
+        """
+        return self.preprocessed_samples[index]

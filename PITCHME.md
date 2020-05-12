@@ -210,6 +210,7 @@ Yuma Kinoshita
 
 ### モデルの評価
     ```
+    $ cd ./src
     $ python test.py
     ```
 

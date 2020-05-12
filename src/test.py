@@ -1,29 +1,30 @@
+import time
 import argparse
-import torch
-import torchvision
-import torchvision.transforms as transforms
-import matplotlib.pyplot as plt
+from pathlib import Path
 import numpy as np
+import matplotlib.pyplot as plt
+import torch
 import torch.nn as nn
-import torch.nn.functional as F
 import torch.optim as optim
+import torchaudio
+from torchsummary import summary
 import trainer
 import model
 import transform as mytf
-from dataset import VCTKWrapper, LIBRISPEECHWrapper, SPEECHCOMMANDSWrapper, AudioFolder
+from dataset import AudioFolder, PreLoadAudioFolder
 
 
 def parse_cmd_line_arguments():
     parser = argparse.ArgumentParser(description='')
     parser.add_argument('--model', help='Model path',
                         type=str,
-                        default='../model')
+                        default='../model/trained_model.pth')
     parser.add_argument('--data_dir', help='Directory for storing datasets.',
                         type=str,
                         default='../data/small-acoustic-scenes')
     parser.add_argument('--batch_size', help='Batch size',
                         type=int,
-                        default=1)
+                        default=4)
     return parser.parse_args()
 
 
@@ -43,10 +44,11 @@ def get_data_loaders(path, batch_size):
     transform = mytf.Compose([torchaudio.transforms.Resample(44100, 8000),
                               torchaudio.transforms.Spectrogram(n_fft=512)])
 
-    testset = AudioFolder(p / 'evaluate', transform=transform)
+    # testset = AudioFolder(p / 'evaluate', transform=transform)
+    testset = PreLoadAudioFolder(p / 'evaluate', transform=transform)
 
-    loader = torch.utils.data.DataLoader(valset, batch_size=batch_size,
-                                             shuffle=False, num_workers=2)
+    loader = torch.utils.data.DataLoader(testset, batch_size=batch_size,
+                                         shuffle=False, num_workers=2)
     return loader, num_classes, classes
 
 
@@ -55,7 +57,7 @@ def examples(loader, net, classes):
     waveforms, labels = dataiter.next()
     print('GroundTruth: ', ' '.join('%5s' % classes[labels[i]] for i in range(len(labels))))
 
-    outputs = net(images)
+    outputs = net(waveforms)
     _, predicted = torch.max(outputs, 1)
     print('Predicted: ', ' '.join('%5s' % classes[predicted[i]] for i in range(len(labels))))
 
@@ -69,15 +71,18 @@ def calculate_accuracy(loader, net, num_classes, classes):
             outputs = net(waveforms)
             _, predicted = torch.max(outputs, 1)
             c = (predicted == labels).squeeze()
-            for i in range(4):
+            for i in range(len(labels)):
                 label = labels[i]
                 class_correct[label] += c[i].item()
                 class_total[label] += 1
 
 
-    for i in range(10):
+    for i in range(num_classes):
         print('Accuracy of %5s : %2d %%' % (
-            classes[i], 100 * class_correct[i] / class_total[i]))
+              classes[i], 100 * class_correct[i] / class_total[i]))
+    
+    print('Total accuracy : %2d %%' % (
+          100 * sum(class_correct) / sum(class_total)))
 
 
 
@@ -89,20 +94,9 @@ if __name__ == "__main__":
 
     loader, num_classes, classes = get_data_loaders(args.data_dir, args.batch_size)
 
-    net = model.DCGANDiscriminator()
+    net = model.DCGANDiscriminator(num_classes=num_classes)
     net.load_state_dict(torch.load(args.model))
     net.eval()
 
     examples(loader, net, classes)
-correct = 0
-total = 0
-with torch.no_grad():
-    for data in testloader:
-        images, labels = data
-        outputs = net(images)
-        _, predicted = torch.max(outputs.data, 1)
-        total += labels.size(0)
-        correct += (predicted == labels).sum().item()
-
-print('Accuracy of the network on the 10000 test images: %d %%' % (
-    100 * correct / total))
+    calculate_accuracy(loader, net, num_classes, classes)
