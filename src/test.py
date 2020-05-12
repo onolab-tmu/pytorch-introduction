@@ -70,7 +70,8 @@ def calculate_accuracy(loader, net, num_classes, classes):
             waveforms, labels = data
             outputs = net(waveforms)
             _, predicted = torch.max(outputs, 1)
-            c = (predicted == labels).squeeze()
+            # c = (predicted == labels).squeeze()
+            c = (predicted == labels)
             for i in range(len(labels)):
                 label = labels[i]
                 class_correct[label] += c[i].item()

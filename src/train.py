@@ -89,7 +89,7 @@ if __name__ == "__main__":
 
     trainloader, valloader, num_classes = get_data_loaders(args.data_dir, args.batch_size)
 
-    #net = model.ResNet('ResNet18', num_classes=num_classes)
+    # net = model.ResNet('ResNet18', num_classes=num_classes)
     net = model.DCGANDiscriminator(num_classes=num_classes)
     net = net.to(device)
     summary(net, input_size=(2, 512, 512))
