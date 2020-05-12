@@ -253,12 +253,12 @@ class DCGANDiscriminator(nn.Module):
             raise NotImplementedError()
 
         self.net = nn.Sequential(
-            down_conv_layer(in_channels=3, out_channels=8,
+            down_conv_layer(in_channels=2, out_channels=8,
                             padding=1, kernel_size=(4, 4),
                             stride=(2, 2), bias=False),
             norm(num_features=8, affine=True,
                  track_running_stats=True),
-            nn.LeakyReLU(inplace=True, negative_slope=0.0),
+            nn.ReLU(inplace=True),
             #nn.Dropout2d(p=0.2),
 
             down_conv_layer(in_channels=8, out_channels=32,
@@ -266,7 +266,7 @@ class DCGANDiscriminator(nn.Module):
                             stride=(2, 2), bias=False),
             norm(num_features=32, affine=True,
                  track_running_stats=True),
-            nn.LeakyReLU(inplace=True, negative_slope=0.0),
+            nn.ReLU(inplace=True),
             #nn.Dropout2d(p=0.2),
 
             down_conv_layer(in_channels=32, out_channels=64,
@@ -274,7 +274,7 @@ class DCGANDiscriminator(nn.Module):
                             stride=(2, 2), bias=False),
             norm(num_features=64, affine=True,
                  track_running_stats=True),
-            nn.LeakyReLU(inplace=True, negative_slope=0.0),
+            nn.ReLU(inplace=True),
             #nn.Dropout2d(p=0.2),
 
             down_conv_layer(in_channels=64, out_channels=64,
@@ -282,7 +282,7 @@ class DCGANDiscriminator(nn.Module):
                             stride=(2, 2), bias=False),
             norm(num_features=64, affine=True,
                  track_running_stats=True),
-            nn.LeakyReLU(inplace=True, negative_slope=0.0),
+            nn.ReLU(inplace=True),
             #nn.Dropout2d(p=0.2),
 
             nn.AdaptiveAvgPool2d(output_size=1)

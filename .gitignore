@@ -91,7 +91,3 @@ ENV/
 
 # VSCode
 .vscode/
-
-# Datasets
-data/
-!/data/small-acoustic-scenes/

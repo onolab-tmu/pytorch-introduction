@@ -171,6 +171,20 @@ Yuma Kinoshita
 +++
 
 ### PyTorchのインストール
+#### 準備
+- soxのインストール
+  - Ubuntu
+    ```
+    sudo apt install sox libsox-dev libsox-fmt-all
+    ```
+  - OSX
+    ```
+    brew install sox
+    ```
+
++++
+
+### PyTorchのインストール
 1. [Get Started](https://pytorch.org/get-started/locally/)から自分の環境を選択
 1. Run this Command 欄に表示されたコマンドを実行
     - torch (PyTorch本体), torchvision (画像処理用パッケージ) がインストールされる
