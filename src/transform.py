@@ -1,7 +1,14 @@
+from abc import ABCMeta, abstractmethod
 import torch
 
 
-class Compose(object):
+class Transform(metaclass = ABCMeta):
+    @abstractmethod
+    def __call__(self, *args):
+        raise NotImplementedError()
+
+
+class Compose(Transform):
     """Composes several transforms together.
 
     Args:
@@ -29,3 +36,14 @@ class Compose(object):
             format_string += '    {0}'.format(t)
         format_string += '\n)'
         return format_string
+
+
+class Zip(Transform):
+    def __init__(self, *transforms):
+        self.transforms = transforms
+    
+    def __call__(self, *args):
+        outputs = []
+        for i in len(args):
+            outputs.append(self.transforms[i](args[i]))
+        return tuple(outputs)
